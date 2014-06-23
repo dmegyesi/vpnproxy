@@ -1,0 +1,6 @@
+http_port %myipaddress%:%port% name=%port%
+
+acl vpn%port% myportname %port%
+http_access allow vpn%port%
+tcp_outgoing_address %tunnelip% vpn%port%
+

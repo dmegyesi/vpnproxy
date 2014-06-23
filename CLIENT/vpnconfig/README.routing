@@ -1,0 +1,21 @@
+# Start OpenVPN instances
+screen -S openvpn3128 openvpn --config client.conf  --script-security 3 --verb 2 --route-nopull
+screen -S openvpn3129 openvpn --config client2.conf  --script-security 3 --verb 2 --route-nopull
+
+
+# Initial setup for routing:
+
+echo 1 VPN3128 >> /etc/iproute2/rt_tables
+echo 2 VPN3129 >> /etc/iproute2/rt_tables
+
+ip rule add from 192.168.0.0/24 table VPN3128
+ip rule add from 192.168.1.0/24 table VPN3129
+
+ip route add default via 192.168.0.5 dev tun0 table VPN3128
+ip route add default via 192.168.1.5 dev tun1 table VPN3129
+
+ip rule add fwmark 3128 table VPN3128
+ip rule add fwmark 3129 table VPN3129
+
+iptables -A OUTPUT -t mangle -s 192.168.0.6 -j MARK --set-mark 3128
+iptables -A OUTPUT -t mangle -s 192.168.1.6 -j MARK --set-mark 3129

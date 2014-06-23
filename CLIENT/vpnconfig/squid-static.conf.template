@@ -1,0 +1,14 @@
+coredump_dir /var/spool/squid3
+
+acl SSL_ports port 443
+acl CONNECT method CONNECT
+
+http_access deny CONNECT !SSL_ports
+
+acl localnet src %localnet%
+
+http_access allow localnet
+http_access deny all
+
+server_persistent_connections off
+
